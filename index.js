@@ -3,10 +3,10 @@ import {
   addTask,
   toggleTask,
   deleteTask,
-  getPending
+  getPendingTasks
 } from "./modules/task.js";
 
-import { render } from "./modules/ui.js";
+import { renderTasks } from "./modules/ui.js";
 
 const form = document.querySelector("#todo-form");
 const input = document.querySelector("#task-input");
@@ -14,35 +14,50 @@ const list = document.querySelector("#task-list");
 const count = document.querySelector("#pending-count");
 const error = document.querySelector("#error-message");
 
-function update() {
-  render(getTasks(), list, handleToggle, handleDelete);
-  count.textContent = getPending().length;
+function updateApp() {
+  renderTasks(getTasks(), list);
+  count.textContent = getPendingTasks().length;
 }
 
-function handleToggle(id) {
-  toggleTask(id);
-  update();
-}
-
-function handleDelete(id) {
-  deleteTask(id);
-  update();
-}
-
-form.addEventListener("submit", e => {
-  e.preventDefault();
+form.addEventListener("submit", event => {
+  event.preventDefault();
 
   const text = input.value.trim();
 
-  if (!text) {
-    error.textContent = "No puedes agregar una tarea vacía";
+  if (text === "") {
+    error.textContent = "No puedes agregar una tarea vacía.";
     return;
   }
 
   error.textContent = "";
   addTask(text);
   input.value = "";
-  update();
+  input.focus();
+
+  updateApp();
 });
 
-update();
+list.addEventListener("click", event => {
+  const button = event.target.closest("button");
+
+  if (!button) return;
+
+  const taskItem = button.closest(".task-item");
+
+  if (!taskItem) return;
+
+  const id = Number(taskItem.dataset.id);
+  const action = button.dataset.action;
+
+  if (action === "toggle") {
+    toggleTask(id);
+  }
+
+  if (action === "delete") {
+    deleteTask(id);
+  }
+
+  updateApp();
+});
+
+updateApp();
