@@ -30,6 +30,6 @@ export function deleteTask(id) {
   saveTasksStorage(tasks);
 }
 
-export function getPending() {
-  return tasks.filter(t => !t.completed);
+export function getPendingTasks() {
+  return tasks.filter(task => !task.completed);
 }
